@@ -1,3 +1,52 @@
+#clase factura cliente
+class Factura_Cliente:
+    cliente = ""
+    monto = 0.0
+    numero_factura = 0
+    fecha = ""
+    estado_pago = ""
+    #metodo constructor
+    def __init__(self, cliente, numero_factura, monto = None,  fecha = None, estado_pago = None):
+        self.cliente = cliente
+        self.numero_factura = numero_factura
+        if monto is not None:
+            self.monto = monto 
+        if fecha is not None:
+            self.fecha = fecha
+        if estado_pago is not None:
+            self.estado_pago = estado_pago
+    
+    #metodo get para el atributo cliente
+    def get_cliente(self):
+        return self.cliente
+    #metodo get para el atributo numero_factura
+    def get_numero_factura(self):
+        return self.numero_factura
+    #metodo get para el atributo monto
+    def get_monto(self):
+        return self.monto   
+    #metodo get para el atributo fecha
+    def get_fecha(self):
+        return self.fecha
+    #metodo get para el atributo estado_pago
+    def get_estado_pago(self):
+        return self.estado_pago
+    #metodo set para el atributo cliente
+    def set_cliente(self, cliente):
+        self.cliente = cliente
+    #metodo set para el atributo numero_factura
+    def set_numero_factura(self, numero_factura):
+        self.numero_factura = numero_factura
+    #metodo set para el atributo monto
+    def set_monto(self, monto):
+        self.monto = monto
+    #metodo set para el atributo fecha
+    def set_fecha(self, fecha):
+        self.fecha = fecha
+    #metodo set para el atributo estado_pago
+    def set_estado_pago(self, estado_pago):
+        self.estado_pago = estado_pago
+
 #Clase Registro de Clientes
 class RegistroClientes:
     nombre = ""
