@@ -47,6 +47,15 @@ class Factura_Cliente:
     def set_estado_pago(self, estado_pago):
         self.estado_pago = estado_pago
 
+    #mostrar factura
+    def mostrar_factura(self):
+        cliente = self.cliente
+        numero_factura = self.numero_factura
+        monto = self.monto
+        fecha = self.fecha
+        estado_pago = self.estado_pago
+        return f"Cliente: {cliente}, Número de factura: {numero_factura}, Monto: {monto}, Fecha: {fecha}, Estado de pago: {estado_pago}"
+
 #Clase Registro de Clientes
 class RegistroClientes:
     nombre = ""
