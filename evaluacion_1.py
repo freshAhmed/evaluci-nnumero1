@@ -7,10 +7,10 @@ class Factura_Cliente:
     monto = 0.0
     numero_factura = 0
     fecha = ""
-    estados_pagos = ["Pagada","Pendiente"]
+    estados_pagos = ["Pagado","Pendiente"]
 
     #metodo constructor
-    def __init__(self, cliente, numero_factura, monto = 0.0, fecha = "", estado_pago = ""):
+    def __init__(self, cliente, numero_factura, monto = 0.0, fecha = "", estado_pago = "Pendiente"):
         self.cliente = cliente
         self.numero_factura = numero_factura
         self.monto = monto 
@@ -46,7 +46,7 @@ class Factura_Cliente:
         self.fecha = fecha
     #metodo set para el atributo estado_pago
     def set_estado_pago(self, estado_pago):
-        self.estado_pago = estado_pago
+        self.estado_pago = estado_pago 
 
     #mostrar factura
     def mostrar_factura(self):
@@ -62,7 +62,14 @@ class Factura_Cliente:
         elif porcentaje_del_descuento>0 and porcentaje_del_descuento<100:
           self.monto-=self.monto*porcentaje_del_descuento
           print(f"El nuevo monto {self.monto}$")
-
+    def marcar_pagado(self,monto):
+       
+       if type(monto)!="decimal":
+          raise Exception("El monto Ingresado no es valido!! debe ser decimal")
+       elif monto<=0:
+          print("El monto Ingresado no es valido!! debe ser mayor de zero")
+          
+       self.set_estado_pago("Pagado")  
 #Clase Registro de Clientes
 class RegistroClientes:
     nombre = ""
