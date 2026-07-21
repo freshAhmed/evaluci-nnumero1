@@ -1,20 +1,21 @@
-#clase factura cliente
+
 class Factura_Cliente:
+    """
+    clase de facturación 
+    """
     cliente = ""
     monto = 0.0
     numero_factura = 0
     fecha = ""
-    estado_pago = ""
+    estados_pagos = ["Pagada","Pendiente"]
+
     #metodo constructor
-    def __init__(self, cliente, numero_factura, monto = None,  fecha = None, estado_pago = None):
+    def __init__(self, cliente, numero_factura, monto = 0.0, fecha = "", estado_pago = ""):
         self.cliente = cliente
         self.numero_factura = numero_factura
-        if monto is not None:
-            self.monto = monto 
-        if fecha is not None:
-            self.fecha = fecha
-        if estado_pago is not None:
-            self.estado_pago = estado_pago
+        self.monto = monto 
+        self.fecha = fecha
+        self.estado_pago = estado_pago
     
     #metodo get para el atributo cliente
     def get_cliente(self):
@@ -55,6 +56,12 @@ class Factura_Cliente:
         fecha = self.fecha
         estado_pago = self.estado_pago
         return f"Cliente: {cliente}, Número de factura: {numero_factura}, Monto: {monto}, Fecha: {fecha}, Estado de pago: {estado_pago}"
+    def aplicar_descuento(self,porcentaje_del_descuento):
+        if type(porcentaje_del_descuento)!="decimal": # validar el porcentaje del descuento
+            raise Exception("El porcentaje del descuento no es valida !!")   
+        elif porcentaje_del_descuento>0 and porcentaje_del_descuento<100:
+          self.monto-=self.monto*porcentaje_del_descuento
+          print(f"El nuevo monto {self.monto}$")
 
 #Clase Registro de Clientes
 class RegistroClientes:
@@ -63,7 +70,7 @@ class RegistroClientes:
     email = ""
     telefono = ""
     #metodo constructor
-    def __init__(self, nombre, rut, email, telefono):
+    def __init__(self, nombre="", rut="", email="", telefono=""):
         self.nombre = nombre
         self.rut = rut
         self.email = email
@@ -115,4 +122,13 @@ while True:
         break
         # Lógica para la Opcion 4
     else:
+
         print("Opcion invalida. Por favor, seleccione una opcion valida.")
+    # una idea para mejorar el sistema es cuando el usario elegio opción distento de la opción de salir y despues realizar el opción elegido, el sistema debe entrar en modo de dormir y cuando usario toca cualquier button del teclado para que se despierta  #
+    #agregar un opción para mostrar las clientes en la base de datos y filtrar usando nombre o rut #
+
+
+if __name__=="main":
+    """
+    realizar las pruebas del sistema aquí !!! 
+    """
