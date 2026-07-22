@@ -1,4 +1,3 @@
-
 class Factura_Cliente:
     """
     clase de facturación 
@@ -56,20 +55,37 @@ class Factura_Cliente:
         fecha = self.fecha
         estado_pago = self.estado_pago
         return f"Cliente: {cliente}, Número de factura: {numero_factura}, Monto: {monto}, Fecha: {fecha}, Estado de pago: {estado_pago}"
+    
     def aplicar_descuento(self,porcentaje_del_descuento):
-        if type(porcentaje_del_descuento)!="decimal": # validar el porcentaje del descuento
+        if not isinstance(porcentaje_del_descuento, (int, float)): # validar el porcentaje del descuento
             raise Exception("El porcentaje del descuento no es valida !!")   
         elif porcentaje_del_descuento>0 and porcentaje_del_descuento<100:
-          self.monto-=self.monto*porcentaje_del_descuento
+          self.monto = self.monto - (self.monto * porcentaje_del_descuento / 100)
           print(f"El nuevo monto {self.monto}$")
-    def marcar_pagado(self,monto):
+
+    def marcar_pagado(self):
        
-       if type(monto)!="decimal":
+       if not isinstance(self.monto, (int, float)):
           raise Exception("El monto Ingresado no es valido!! debe ser decimal")
-       elif monto<=0:
+       
+       elif self.monto<=0:
           print("El monto Ingresado no es valido!! debe ser mayor de zero")
+          return
           
        self.set_estado_pago("Pagado")  
+
+#Crear factura de cliente
+def crear_factura():
+    cliente = input("Ingrese el nombre del cliente: ")
+    numero_factura = int(input("Ingrese el número de factura: "))
+    monto = float(input("Ingrese el monto de la factura: "))
+    fecha = input("Ingrese la fecha de la factura (YYYY-MM-DD): ")
+    
+    factura = Factura_Cliente(cliente, numero_factura, monto, fecha)
+    print("Factura creada exitosamente:")
+    print(factura.mostrar_factura())
+    return factura
+
 #Clase Registro de Clientes
 class RegistroClientes:
     nombre = ""
@@ -100,6 +116,7 @@ def registrar_cliente():
 
 #definir diccionario para almacenar los clientes
 diccionario = {}
+diccionario_facturas = {}
 
 #Menu Principal
 while True:
@@ -120,6 +137,8 @@ while True:
         # Lógica para la Opcion 1
     elif opcion == "2":
         print("Has seleccionado la Opcion 2")
+        factura = crear_factura()
+        diccionario_facturas[factura.get_numero_factura()] = factura
         # Lógica para la Opcion 2
     elif opcion == "3":
         print("Has seleccionado la Opcion 3")
@@ -135,7 +154,12 @@ while True:
     #agregar un opción para mostrar las clientes en la base de datos y filtrar usando nombre o rut #
 
 
-if __name__=="main":
+if __name__== "__main__":
     """
     realizar las pruebas del sistema aquí !!! 
     """
+    factura = Factura_Cliente("Juan Perez", 12345, 100.0, "2023-06-01", "Pendiente")
+    print(factura.mostrar_factura())
+    factura.aplicar_descuento(10)
+    factura.marcar_pagado()
+    print(factura.mostrar_factura())
