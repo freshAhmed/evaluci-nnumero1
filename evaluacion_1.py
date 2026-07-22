@@ -1,11 +1,28 @@
+import re #Regular expression libreria
+import time
+def veríficar_el_rut(rut):
+    #verifícar el Rut ingresado por la cliente 
+    regxrut=r"^\d{7,8}-?[0-9Kk]$"
+    return True if re.match(regxrut,rut) is not None else False 
+
+def veríficar_el_correo(email):
+    regxemail=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return True if re.match(regxemail,email) is not None else False 
+
+def veríficar_el_telefono(telefono):
+ regxtelefono=r"^(\+56)?9\d{8}"
+ return True if re.match(regxtelefono,telefono) is not None else False
+
+def gettime():
+    tiempo_estractura=time.gmtime()
+    return str(time.strftime("%Y-%m-%d %H:%M:%S",tiempo_estractura))  
+    
+
 class Factura_Cliente:
     """
     clase de facturación 
     """
-    cliente = ""
-    monto = 0.0
-    numero_factura = 0
-    fecha = ""
+
     estados_pagos = ["Pagado","Pendiente"]
 
     #metodo constructor
@@ -75,38 +92,47 @@ class Factura_Cliente:
        self.set_estado_pago("Pagado")  
 
 #Crear factura de cliente
-def crear_factura():
-    cliente = input("Ingrese el nombre del cliente: ")
+def crear_factura(cliente):
+    nombrecliente = cliente.nombre
     numero_factura = int(input("Ingrese el número de factura: "))
     monto = float(input("Ingrese el monto de la factura: "))
-    fecha = input("Ingrese la fecha de la factura (YYYY-MM-DD): ")
+    fecha = gettime()
     
-    factura = Factura_Cliente(cliente, numero_factura, monto, fecha)
+    factura = Factura_Cliente(nombrecliente, numero_factura, monto, fecha)
     print("Factura creada exitosamente:")
     print(factura.mostrar_factura())
     return factura
 
 #Clase Registro de Clientes
 class RegistroClientes:
-    nombre = ""
-    rut = ""
-    email = ""
-    telefono = ""
+
     #metodo constructor
     def __init__(self, nombre="", rut="", email="", telefono=""):
         self.nombre = nombre
         self.rut = rut
         self.email = email
         self.telefono = telefono
-
+        self.registro_de_facturas={} 
 #Registro de Clientes
 def registrar_cliente():
-    nombre = input("Ingrese el nombre del cliente: ")
-    rut = input("Ingrese el RUT del cliente: ")
-    email = input("Ingrese el correo electrónico del cliente: ")
-    telefono = input("Ingrese el número de teléfono del cliente: ")
+    nombre = str(input("Ingrese el nombre del cliente: "))
+    rut = str(input("Ingrese el RUT del cliente: ")) 
+    while not veríficar_el_rut(rut): 
+      print(f"El Rut {rut} Ingresado no es valido !!")
+      rut = str(input("Ingrese el RUT del cliente: ")) 
 
-    cliente = RegistroClientes(nombre, rut, email, telefono)
+    email = str(input("Ingrese el correo electrónico del cliente: "))
+    while not veríficar_el_correo(email):
+     print(f"El correo {email} Ingresado no es valido!!")
+     email = str(input("Ingrese el correo electrónico del cliente: "))
+     
+    telefono = str(input("Ingrese el número de teléfono del cliente: "))
+    while not veríficar_el_telefono(telefono):
+       print(f"el telefono Ingresado no es valido!!")
+       telefono = str(input("Ingrese el número de teléfono del cliente: "))
+
+    cliente = RegistroClientes(nombre, rut, email, telefono) if not (rut in dict.keys(registro_cliente)) else registro_cliente[rut]
+
     print("Cliente registrado exitosamente:")
     print(f"Nombre: {cliente.nombre}")
     print(f"RUT: {cliente.rut}")
@@ -115,7 +141,7 @@ def registrar_cliente():
     return cliente
 
 #definir diccionario para almacenar los clientes
-diccionario = {}
+registro_de_clientes = {}
 diccionario_facturas = {}
 
 #Menu Principal
@@ -126,25 +152,32 @@ while True:
     print("3. Gestión el estado de pagos")
     print("4. Salir")
 
-    opcion = input("Seleccione una opcion: ")
+    opcion = int(input("Seleccione una opcion: "))
 
-    if opcion == "1":
+    if opcion == "1": # Registro de Clientes
         print("Has seleccionado la Opcion 1")
         registro_cliente = registrar_cliente()
-        diccionario[registro_cliente.rut] = registro_cliente
-        print(diccionario)
+        print(f"Nombre : {registro_cliente.nombre}\n Rut:{registro_cliente.rut}\n Email:{registro_cliente.email}\n Teléfono:{registro_cliente.telefono}\n")
+        registro_cliente[registro_cliente.rut] = registro_cliente
+        print("El cliente fue registrado !!")
+
 
         # Lógica para la Opcion 1
-    elif opcion == "2":
+    elif opcion == "2": # crear Nueva factura
         print("Has seleccionado la Opcion 2")
+        rut=str(input("ingresa el Rut del cliente"))
+        while not veríficar_el_rut(rut): 
+          print(f"El Rut {rut} Ingresado no es valido !!")
+          rut = str(input("Ingrese el RUT del cliente: ")) 
+        
         factura = crear_factura()
         diccionario_facturas[factura.get_numero_factura()] = factura
         print(diccionario_facturas)
         # Lógica para la Opcion 2
-    elif opcion == "3":
+    elif opcion == "3": # gestión el estado de pago
         print("Has seleccionado la Opcion 3")
         # Lógica para la Opcion 3
-    elif opcion == "4":
+    elif opcion == "4": # salir
         print("Saliendo del programa...")
         break
         # Lógica para la Opcion 4
@@ -159,11 +192,11 @@ if __name__== "__main__":
     """
     realizar las pruebas del sistema aquí !!! 
     """
-    factura = Factura_Cliente("Juan Perez", 12345, 100.0, "2023-06-01", "Pendiente")
-    print(factura.mostrar_factura())
-    factura.aplicar_descuento(10)
-    factura.marcar_pagado()
-    print(factura.mostrar_factura())
-d = {1: "a", 2: "b"}
-print(d.get(1))
-print(d.get(99))
+#     factura = Factura_Cliente("Juan Perez", 12345, 100.0, "Pendiente")
+#     print(factura.mostrar_factura())
+#     factura.aplicar_descuento(10)
+#     factura.marcar_pagado()
+#     print(factura.mostrar_factura())
+# d = {1: "a", 2: "b"}
+# print(d.get(1))
+# print(d.get(99))
