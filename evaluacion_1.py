@@ -139,6 +139,7 @@ while True:
         print("Has seleccionado la Opcion 2")
         factura = crear_factura()
         diccionario_facturas[factura.get_numero_factura()] = factura
+        print(diccionario_facturas)
         # Lógica para la Opcion 2
     elif opcion == "3":
         print("Has seleccionado la Opcion 3")
@@ -163,3 +164,6 @@ if __name__== "__main__":
     factura.aplicar_descuento(10)
     factura.marcar_pagado()
     print(factura.mostrar_factura())
+d = {1: "a", 2: "b"}
+print(d.get(1))
+print(d.get(99))
