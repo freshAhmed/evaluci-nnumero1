@@ -1,5 +1,6 @@
 import re #Regular expression libreria
 import time
+from decimal import Decimal
 def veríficar_el_rut(rut):
     #verifícar el Rut ingresado por la cliente 
     regxrut=r"^\d{7,8}-?[0-9Kk]$"
@@ -80,24 +81,20 @@ class Factura_Cliente:
           self.monto = self.monto - (self.monto * porcentaje_del_descuento / 100)
           print(f"El nuevo monto {self.monto}$")
 
-    def marcar_pagado(self):
+    def marcar_pagado(self,dinero_pagado=0):
        
-       if not isinstance(self.monto, (int, float)):
-          raise Exception("El monto Ingresado no es valido!! debe ser decimal")
+       if isinstance(dinero_pagado, (int, float)):
+          raise Exception("El monto pagado Ingresado no es valido!! debe ser decimal")
        
-       elif self.monto<=0:
-          print("El monto Ingresado no es valido!! debe ser mayor de zero")
+       elif dinero_pagado<=0:
+          raise Exception("El monto pagado Ingresado no es valido!! debe ser mayor de zero")
           return
-          
+       
        self.set_estado_pago("Pagado")  
 
 #Crear factura de cliente
-def crear_factura(rut):
-    cliente = registro_de_clientes.get(rut)
-    if not cliente:
-        print("Cliente no encontrado.")
-        return None
-        
+def crear_factura(cliente):
+ 
     nombrecliente = cliente.nombre
     try:
         numero_factura = int(input("Ingrese el número de factura: "))
@@ -118,7 +115,7 @@ def crear_factura(rut):
     return factura
 
 #Clase Registro de Clientes
-class RegistroClientes:
+class Cliente:
 
     #metodo constructor
     def __init__(self, nombre="", rut="", email="", telefono=""):
@@ -145,7 +142,7 @@ def registrar_cliente():
        print(f"el telefono Ingresado no es valido!!")
        telefono = str(input("Ingrese el número de teléfono del cliente: "))
 
-    cliente = RegistroClientes(nombre, rut, email, telefono) if not (rut in dict.keys(registro_de_clientes)) else registro_de_clientes[rut]
+    cliente = Cliente(nombre, rut, email, telefono) if not (rut in dict.keys(registro_de_clientes)) else registro_de_clientes.get(rut)
 
     print("Cliente registrado exitosamente:")
     print(f"Nombre: {cliente.nombre}")
@@ -156,44 +153,100 @@ def registrar_cliente():
 
 #gestión el estado de pago
 def gestionar_estado_pago():
-    rut = input("Ingrese el RUT del cliente: ")
-    cliente = registro_de_clientes.get(rut)
-    if not cliente:
+
+
+    print("1. Marcar como pagada")
+    print("2. Descuento")
+    print("3. mostrar lista de facturas del cliente")
+    print("4. salir")
+    opcion = int(input("Seleccione una opción: "))
+
+    
+    if opcion == 1:
+     rut = str(input("Ingrese el RUT del cliente: "))
+     while not veríficar_el_rut(rut): 
+      print(f"El Rut {rut} Ingresado no es valido !!")
+      rut = str(input("Ingrese el RUT del cliente: ")) 
+
+     cliente = registro_de_clientes.get(rut)
+     if not cliente:
         print("Cliente no encontrado.")
         return
 
-    try:
+     try:
         numero_factura = int(input("Ingrese el número de factura: "))
-        factura = diccionario_facturas.get(numero_factura)
+        factura = cliente.registro_de_facturas.get(numero_factura)
         if not factura:
             print("Factura no encontrada.")
             return
-    except ValueError:
+     except ValueError:
         print("Error: El número de factura debe ser un entero.")
         return
+     print(f"Estado actual de la factura: {factura.get_estado_pago()}")
+     try:
+          if factura.get_estado_pago()=="Pendiente":
+           dinero_pagado=Decimal(input(f"Ingrese el monto pagado: debe ser mayor de zero y igual al monto de la factura {factura.get_monto()}$ "))
 
-    print(f"Estado actual de la factura: {factura.get_estado_pago()}")
-    print("1. Marcar como pagada")
-    print("2. Descuento")
-    opcion = input("Seleccione una opción: ")
-    if opcion == "1":
-        factura.marcar_pagado()
-        print(f"Estado actualizado de la factura: {factura.get_estado_pago()}")
-    elif opcion == "2":
-        try:
+     except ValueError:
+      print("Error:El monto pagado debe ser un numero decimal.")
+        
+     factura.marcar_pagado(dinero_pagado)
+     print(f"Estado actualizado de la factura: {factura.get_estado_pago()}")
+    elif opcion == 2:
+     rut = str(input("Ingrese el RUT del cliente: "))
+     while not veríficar_el_rut(rut): 
+      print(f"El Rut {rut} Ingresado no es valido !!")
+      rut = str(input("Ingrese el RUT del cliente: ")) 
+
+     cliente = registro_de_clientes.get(rut)
+     if not cliente:
+      print("Cliente no encontrado.")
+      return
+
+     try:
+        numero_factura = int(input("Ingrese el número de factura: "))
+        factura = cliente.registro_de_facturas.get(numero_factura)
+        if not factura:
+            print("Factura no encontrada.")
+            return
+     except ValueError:
+        print("Error: El número de factura debe ser un entero.")
+        return
+     try:
             porcentaje = float(input("Ingrese el porcentaje de descuento: "))
             factura.aplicar_descuento(porcentaje)
-        except ValueError:
-            print("Error: El porcentaje de descuento debe ser un número decimal.")
+     except ValueError:
+       print("Error: El porcentaje de descuento debe ser un número decimal.")
+   
+   
+
+    elif opcion == 3:
+      rut = str(input("Ingrese el RUT del cliente: "))
+      while not veríficar_el_rut(rut): 
+        print(f"El Rut {rut} Ingresado no es valido !!")
+        rut = str(input("Ingrese el RUT del cliente: "))   
+      cliente = registro_de_clientes.get(rut)
+      if not cliente:
+        print("Cliente no encontrado.")
+        return
+      print("Lista de facturas del cliente:")
+      for factura in cliente.registro_de_facturas.values():
+        print("|-------------------------|")
+        print(factura.mostrar_factura())
+
+    elif opcion == 4:
+        print("Saliendo de la gestión de pagos...")
+        return
     else:
         print("Opción inválida.")
         
 #definir diccionario para almacenar los clientes
 registro_de_clientes = {}
-diccionario_facturas = {}
+
 
 #Menu Principal
-while True:
+def menu_principal():
+ while True:
     print("Menu Principal Jaguar")
     print("1. Registro de Clientes")
     print("2. Facturacion")
@@ -204,23 +257,22 @@ while True:
 
     if opcion == "1": # Registro de Clientes
         print("Has seleccionado la Opcion 1")
-        registro_cliente = registrar_cliente()
-        #print(f"Nombre : {registro_cliente.nombre}\n Rut:{registro_cliente.rut}\n Email:{registro_cliente.email}\n Teléfono:{registro_cliente.telefono}\n")
-        registro_de_clientes[registro_cliente.rut] = registro_cliente
+        cliente = registrar_cliente()
+        registro_de_clientes[cliente.rut] = cliente
         print("El cliente fue registrado !!")
-
-
         # Lógica para la Opcion 1
     elif opcion == "2": # crear Nueva factura
         print("Has seleccionado la Opcion 2")
-        rut=input("ingresa el Rut del cliente: ")
+        rut=str(input("ingresa el Rut del cliente: "))
         while not veríficar_el_rut(rut): 
           print(f"El Rut {rut} Ingresado no es valido !!")
           rut = str(input("Ingrese el RUT del cliente: ")) 
-        
-        factura = crear_factura(rut)
+        cliente=registro_de_clientes.get(rut)
+        if not cliente:
+          print("Cliente no encontrado.")
+        factura = crear_factura(cliente) if cliente is not None else None
         if factura is not None:
-            diccionario_facturas[factura.get_numero_factura()] = factura
+            cliente.registro_de_facturas[factura.get_numero_factura()] = factura
     
         # Lógica para la Opcion 2
     elif opcion == "3": # gestión el estado de pago
@@ -232,21 +284,10 @@ while True:
         break
         # Lógica para la Opcion 4
     else:
-
         print("Opcion invalida. Por favor, seleccione una opcion valida.")
-    # una idea para mejorar el sistema es cuando el usario elegio opción distento de la opción de salir y despues realizar el opción elegido, el sistema debe entrar en modo de dormir y cuando usario toca cualquier button del teclado para que se despierta  #
-    #agregar un opción para mostrar las clientes en la base de datos y filtrar usando nombre o rut #
-
-
+ 
 if __name__== "__main__":
     """
     realizar las pruebas del sistema aquí !!! 
-    """
-#     factura = Factura_Cliente("Juan Perez", 12345, 100.0, "Pendiente")
-#     print(factura.mostrar_factura())
-#     factura.aplicar_descuento(10)
-#     factura.marcar_pagado()
-#     print(factura.mostrar_factura())
-# d = {1: "a", 2: "b"}
-# print(d.get(1))
-# print(d.get(99))
+   """
+    menu_principal()
