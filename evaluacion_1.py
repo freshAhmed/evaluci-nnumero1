@@ -62,7 +62,7 @@ class Factura_Cliente:
         self.fecha = fecha
     #metodo set para el atributo estado_pago
     def set_estado_pago(self, estado_pago):
-        self.estado_pago = estado_pago 
+        self.estado_pago = estado_pago if estado_pago in self.estados_pagos else "Pendiente"
 
     #mostrar factura
     def mostrar_factura(self):
@@ -101,12 +101,17 @@ def crear_factura(rut):
     nombrecliente = cliente.nombre
     try:
         numero_factura = int(input("Ingrese el número de factura: "))
-        monto = float(input("Ingrese el monto de la factura: "))
-        fecha = gettime()
     except ValueError:
-        print("Error: El número de factura debe ser un entero y el monto debe ser un número decimal.")
+        print("Error: El número de factura debe ser un entero.")
         return None
-    
+    try:
+         monto = float(input("Ingrese el monto de la factura: "))
+
+    except ValueError:
+        print("Error:El monto debe ser un número decimal.")
+        return None
+
+    fecha = gettime()
     factura = Factura_Cliente(nombrecliente, numero_factura, monto, fecha)
     print("Factura creada exitosamente:")
     print(factura.mostrar_factura())
