@@ -99,9 +99,13 @@ def crear_factura(rut):
         return None
         
     nombrecliente = cliente.nombre
-    numero_factura = int(input("Ingrese el número de factura: "))
-    monto = float(input("Ingrese el monto de la factura: "))
-    fecha = gettime()
+    try:
+        numero_factura = int(input("Ingrese el número de factura: "))
+        monto = float(input("Ingrese el monto de la factura: "))
+        fecha = gettime()
+    except ValueError:
+        print("Error: El número de factura debe ser un entero y el monto debe ser un número decimal.")
+        return None
     
     factura = Factura_Cliente(nombrecliente, numero_factura, monto, fecha)
     print("Factura creada exitosamente:")
@@ -153,10 +157,14 @@ def gestionar_estado_pago():
         print("Cliente no encontrado.")
         return
 
-    numero_factura = int(input("Ingrese el número de factura: "))
-    factura = diccionario_facturas.get(numero_factura)
-    if not factura:
-        print("Factura no encontrada.")
+    try:
+        numero_factura = int(input("Ingrese el número de factura: "))
+        factura = diccionario_facturas.get(numero_factura)
+        if not factura:
+            print("Factura no encontrada.")
+            return
+    except ValueError:
+        print("Error: El número de factura debe ser un entero.")
         return
 
     print(f"Estado actual de la factura: {factura.get_estado_pago()}")
@@ -167,8 +175,11 @@ def gestionar_estado_pago():
         factura.marcar_pagado()
         print(f"Estado actualizado de la factura: {factura.get_estado_pago()}")
     elif opcion == "2":
-        porcentaje = float(input("Ingrese el porcentaje de descuento: "))
-        factura.aplicar_descuento(porcentaje)
+        try:
+            porcentaje = float(input("Ingrese el porcentaje de descuento: "))
+            factura.aplicar_descuento(porcentaje)
+        except ValueError:
+            print("Error: El porcentaje de descuento debe ser un número decimal.")
     else:
         print("Opción inválida.")
         
