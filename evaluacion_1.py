@@ -92,7 +92,12 @@ class Factura_Cliente:
        self.set_estado_pago("Pagado")  
 
 #Crear factura de cliente
-def crear_factura(cliente):
+def crear_factura(rut):
+    cliente = registro_de_clientes.get(rut)
+    if not cliente:
+        print("Cliente no encontrado.")
+        return None
+        
     nombrecliente = cliente.nombre
     numero_factura = int(input("Ingrese el número de factura: "))
     monto = float(input("Ingrese el monto de la factura: "))
@@ -131,7 +136,7 @@ def registrar_cliente():
        print(f"el telefono Ingresado no es valido!!")
        telefono = str(input("Ingrese el número de teléfono del cliente: "))
 
-    cliente = RegistroClientes(nombre, rut, email, telefono) if not (rut in dict.keys(registro_cliente)) else registro_cliente[rut]
+    cliente = RegistroClientes(nombre, rut, email, telefono) if not (rut in dict.keys(registro_de_clientes)) else registro_de_clientes[rut]
 
     print("Cliente registrado exitosamente:")
     print(f"Nombre: {cliente.nombre}")
@@ -140,6 +145,33 @@ def registrar_cliente():
     print(f"Teléfono: {cliente.telefono}")
     return cliente
 
+#gestión el estado de pago
+def gestionar_estado_pago():
+    rut = input("Ingrese el RUT del cliente: ")
+    cliente = registro_de_clientes.get(rut)
+    if not cliente:
+        print("Cliente no encontrado.")
+        return
+
+    numero_factura = int(input("Ingrese el número de factura: "))
+    factura = diccionario_facturas.get(numero_factura)
+    if not factura:
+        print("Factura no encontrada.")
+        return
+
+    print(f"Estado actual de la factura: {factura.get_estado_pago()}")
+    print("1. Marcar como pagada")
+    print("2. Descuento")
+    opcion = input("Seleccione una opción: ")
+    if opcion == "1":
+        factura.marcar_pagado()
+        print(f"Estado actualizado de la factura: {factura.get_estado_pago()}")
+    elif opcion == "2":
+        porcentaje = float(input("Ingrese el porcentaje de descuento: "))
+        factura.aplicar_descuento(porcentaje)
+    else:
+        print("Opción inválida.")
+        
 #definir diccionario para almacenar los clientes
 registro_de_clientes = {}
 diccionario_facturas = {}
@@ -152,30 +184,32 @@ while True:
     print("3. Gestión el estado de pagos")
     print("4. Salir")
 
-    opcion = int(input("Seleccione una opcion: "))
+    opcion = input("Seleccione una opcion: ")
 
     if opcion == "1": # Registro de Clientes
         print("Has seleccionado la Opcion 1")
         registro_cliente = registrar_cliente()
-        print(f"Nombre : {registro_cliente.nombre}\n Rut:{registro_cliente.rut}\n Email:{registro_cliente.email}\n Teléfono:{registro_cliente.telefono}\n")
-        registro_cliente[registro_cliente.rut] = registro_cliente
+        #print(f"Nombre : {registro_cliente.nombre}\n Rut:{registro_cliente.rut}\n Email:{registro_cliente.email}\n Teléfono:{registro_cliente.telefono}\n")
+        registro_de_clientes[registro_cliente.rut] = registro_cliente
         print("El cliente fue registrado !!")
 
 
         # Lógica para la Opcion 1
     elif opcion == "2": # crear Nueva factura
         print("Has seleccionado la Opcion 2")
-        rut=str(input("ingresa el Rut del cliente"))
+        rut=input("ingresa el Rut del cliente: ")
         while not veríficar_el_rut(rut): 
           print(f"El Rut {rut} Ingresado no es valido !!")
           rut = str(input("Ingrese el RUT del cliente: ")) 
         
-        factura = crear_factura()
-        diccionario_facturas[factura.get_numero_factura()] = factura
-        print(diccionario_facturas)
+        factura = crear_factura(rut)
+        if factura is not None:
+            diccionario_facturas[factura.get_numero_factura()] = factura
+    
         # Lógica para la Opcion 2
     elif opcion == "3": # gestión el estado de pago
         print("Has seleccionado la Opcion 3")
+        gestionar_estado_pago()
         # Lógica para la Opcion 3
     elif opcion == "4": # salir
         print("Saliendo del programa...")
